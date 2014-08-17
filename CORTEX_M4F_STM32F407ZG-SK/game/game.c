@@ -8,9 +8,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MESSAGE1   "SCORE= %d"   //提示信息
 //Player1
 int16_t player1X = 10;
 int16_t player1Y = 10;
+uint8_t score1_0=48;
+uint8_t score1_1=48;
+uint8_t score2_0=48;
+uint8_t score2_1=48;
 uint16_t player1W = 60;
 uint16_t player1H = 10;
 uint8_t player1IsReversed = 1;
@@ -23,9 +28,9 @@ uint16_t player2H = 10;
 uint8_t player2IsReversed = 0;
 
 //Ball
-uint16_t ballSize = 5;
-int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) / 2;
-int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) / 2;
+uint16_t ballSize = 5;              //球的大小
+int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) /2;   //??
+int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) /2; //??
 int16_t ballVX = 5;
 int16_t ballVY = 5;
 uint8_t ballIsRun = 0;
@@ -37,14 +42,14 @@ void
 BallReset()
 {
 	ballX = ( LCD_PIXEL_WIDTH - 5 ) / 2;
-	ballY = ( LCD_PIXEL_HEIGHT - 5 ) / 2;
+	ballY = ( LCD_PIXEL_HEIGHT - 5) / 2;
 
 	ballVX = 5;
 	ballVY = 5;
-
+    score2_0=47;
 	ballIsRun = 1;
 }
-
+//player1j is burron
 void
 GAME_EventHandler1()
 {
@@ -58,6 +63,7 @@ GAME_EventHandler1()
 	}
 }
 
+//player2 is touch
 void
 GAME_EventHandler2()
 {
@@ -154,6 +160,11 @@ GAME_Update()
 				}
 				else
 					BallReset();
+					 score2_0++;
+					 if(score2_0 ==58){
+                        score2_0=48;
+                        score2_1++;
+                        }
 			}
 
 			if( ballY <= player1Y + player1H ){
@@ -181,6 +192,11 @@ GAME_Update()
 					}
 					else
 						BallReset();
+						 score1_0++;
+						 if(score1_0 ==58){
+                        score1_0=48;
+                        score1_1++;
+                        }
 				}
 			}
 		}
@@ -242,6 +258,7 @@ GAME_Update()
 				//PONG!
 				ballY += ballVY;
 				if( ballY + ballSize >= player2Y ){
+
 					if( ballX + ballSize >= player2X && ballX <= player2X + player2W ){
 					if( ballX - ballSize <= player2Y + player2W/4 ){
 						ballVY =-3;
@@ -263,14 +280,16 @@ GAME_Update()
 						ballVY =-9;
 						ballVX = 0;
 					}
+
 				}
 				else
+
 					BallReset();
 			}
 
 			if( ballY <= player1Y + player1H ){
 				if( ballX + ballSize >= player1X && ballX <= player1X + player1W ){
-					if( ballX - ballSize <= player1Y + player1W/4 ){
+                    if( ballX - ballSize <= player1Y + player1W/4 ){
 						ballVY = 3;
 						ballVX =-7;
 					}
@@ -290,7 +309,9 @@ GAME_Update()
 						ballVY = 9;
 						ballVX = 0;
 					}
+
 				}
+
 				else
 					BallReset();
 			}
@@ -301,9 +322,21 @@ GAME_Update()
 	void
 GAME_Render()
 {
-	LCD_SetTextColor( LCD_COLOR_WHITE );
+	LCD_SetTextColor( LCD_COLOR_BLUE );
 	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
 	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
 	LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
 	LCD_DrawLine( 10, LCD_PIXEL_HEIGHT / 2, LCD_PIXEL_WIDTH - 20, LCD_DIR_HORIZONTAL );
+    //LCD_SetBackColor(LCD_COLOR_GREEN);
+    //LCD_DisplayStringLine(LINE(1),score2);
+    //sprintf((char*) score1, MESSAGE1 , score2);
+    //LCD_DisplayStringLine(LINE(10), (uint8_t*)score2);
+
+    LCD_DisplayChar(200,15, score2_0);
+    LCD_DisplayChar(200,0, score2_1);
+    //LCD_DisplayStringLine(LINE(10), "HELLO");
+
+    //LCD_DrawRect(30,40,50,50);
+    //LCD_DrawFullRect(31, 41, 179, 149);
 }
+
