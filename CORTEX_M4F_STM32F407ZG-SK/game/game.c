@@ -12,10 +12,6 @@
 //Player1
 int16_t player1X = 10;
 int16_t player1Y = 10;
-uint8_t score1_0=48;
-uint8_t score1_1=48;
-uint8_t score2_0=48;
-uint8_t score2_1=48;
 uint16_t player1W = 60;
 uint16_t player1H = 10;
 uint8_t player1IsReversed = 1;
@@ -38,6 +34,12 @@ uint8_t ballIsRun = 0;
 //Mode
 uint8_t demoMode = 0;
 
+//score
+uint8_t score1_0=48;
+uint8_t score1_1=48;
+uint8_t score2_0=48;
+uint8_t score2_1=48;
+
 void
 BallReset()
 {
@@ -46,10 +48,10 @@ BallReset()
 
 	ballVX = 5;
 	ballVY = 5;
-    score2_0=47;
+    	score2_0=47;
 	ballIsRun = 1;
 }
-//player1j is burron
+//player1 is burron
 void
 GAME_EventHandler1()
 {
@@ -94,17 +96,35 @@ GAME_Update()
 	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
 
 	if( demoMode == 0 ){
-
+		/*
 		if( player1IsReversed )
 			player1X -= 5;
 		else
 			player1X += 5;
 
+		if( player1X <= 10 )
+			player1X -= 5;
+		//else if( player1X >= LCD_PIXEL_WIDTH - 20 )
+			//player1X += 5;
+
 		if( player1X <= 0 )
 			player1X = 0;
 		else if( player1X + player1W >= LCD_PIXEL_WIDTH )
-			player1X = LCD_PIXEL_WIDTH - player1W;
-
+			player1X = LCD_PIXEL_WIDTH - player1W;*/
+		if( ballVY < 0 ){
+			if( player1X + player1W/2 < ballX + ballSize/2 ){
+				player1X += 8;
+				player2X += 2;
+				}
+			else{
+				player1X -= 8;
+				player2X -= 2;
+				}
+			}
+			if( player1X <= 0 )
+				player1X = 0;
+			else if( player1X + player1W >= LCD_PIXEL_WIDTH )
+				player1X = LCD_PIXEL_WIDTH - player1W;
 		//Player2
 		if( player2IsReversed )
 			player2X -= 5;
@@ -162,9 +182,9 @@ GAME_Update()
 					BallReset();
 					 score2_0++;
 					 if(score2_0 ==58){
-                        score2_0=48;
-                        score2_1++;
-                        }
+                        			score2_0=48;
+                        			score2_1++;
+                        			}
 			}
 
 			if( ballY <= player1Y + player1H ){
@@ -322,7 +342,12 @@ GAME_Update()
 	void
 GAME_Render()
 {
-	LCD_SetTextColor( LCD_COLOR_BLUE );
+    if((score2_0%2)==0)
+        LCD_SetTextColor( LCD_COLOR_BLUE );
+     if((score2_0%2)==1)
+        LCD_SetTextColor( LCD_COLOR_GREEN );
+	//LCD_SetTextColor( LCD_COLOR_YELLOW );
+	LCD_SetBackColor( LCD_COLOR_BLACK );
 	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
 	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
 	LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
@@ -331,6 +356,8 @@ GAME_Render()
     //LCD_DisplayStringLine(LINE(1),score2);
     //sprintf((char*) score1, MESSAGE1 , score2);
     //LCD_DisplayStringLine(LINE(10), (uint8_t*)score2);
+    if (score2_0 == 47)
+        score2_0 =48;
 
     LCD_DisplayChar(200,15, score2_0);
     LCD_DisplayChar(200,0, score2_1);
@@ -339,4 +366,3 @@ GAME_Render()
     //LCD_DrawRect(30,40,50,50);
     //LCD_DrawFullRect(31, 41, 179, 149);
 }
-
