@@ -7,14 +7,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MESSAGE1   "SCORE= %d"   //提示信息
 //Player1
 int16_t player1X = 10;
-int16_t player1Y = 10;
-uint16_t player1W = 60;
+int16_t player1Y = 1;
+uint16_t player1W = 10;
 uint16_t player1H = 10;
 uint8_t player1IsReversed = 1;
+int16_t player1XX;
+int16_t i , j , k=0;
 
 //Player2
 int16_t player2X = LCD_PIXEL_WIDTH - 20;
@@ -25,14 +28,16 @@ uint8_t player2IsReversed = 0;
 
 //Ball
 uint16_t ballSize = 5;              //球的大小
-int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) /2;   //??
-int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) /2; //??
+//int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) /2;   //??
+//int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) /2; //??
+int16_t ballX = 50;
+int16_t ballY = 1;
 int16_t ballVX = 5;
 int16_t ballVY = 5;
 uint8_t ballIsRun = 0;
 
 //Mode
-uint8_t demoMode = 0;
+uint8_t demoMode = 3;
 
 //score
 uint8_t score1_0=48;
@@ -40,35 +45,48 @@ uint8_t score1_1=48;
 uint8_t score2_0=48;
 uint8_t score2_1=48;
 
+
+
+
+
 void
 BallReset()
 {
+    /*
 	ballX = ( LCD_PIXEL_WIDTH - 5 ) / 2;
 	ballY = ( LCD_PIXEL_HEIGHT - 5) / 2;
+    ballX=10;
+    ballY=1;
 
 	ballVX = 5;
 	ballVY = 5;
     	score2_0=47;
 	ballIsRun = 1;
+	*/
+
+
+    ballX= (rand() % (LCD_PIXEL_WIDTH -10) ) +1;
+    ballY= (rand() % (LCD_PIXEL_HEIGHT-10 )) +1;
 }
 //player1 is burron
 void
 GAME_EventHandler1()
 {
-	if( STM_EVAL_PBGetState( BUTTON_USER ) ){
+	/*if( STM_EVAL_PBGetState( BUTTON_USER ) ){
 
 		player1IsReversed = 0;
 
 		while( STM_EVAL_PBGetState( BUTTON_USER ) );
 
 		player1IsReversed = 1;
-	}
+	}*/
 }
 
 //player2 is touch
 void
 GAME_EventHandler2()
 {
+/*
 	if( IOE_TP_GetState()->TouchDetected ){
 
 		player2IsReversed = 1;
@@ -76,25 +94,199 @@ GAME_EventHandler2()
 		while( IOE_TP_GetState()->TouchDetected );
 
 		player2IsReversed = 0;
-	}
+	}*/
 }
 
 void
 GAME_EventHandler3()
 {
-	if( ballIsRun == 0 ){
-		BallReset();
-	}
+/*	if( ballIsRun == 0 ){
+		BallReset();*/
+
 }
 
 void
 GAME_Update()
 {
 	//Player1
-	LCD_SetTextColor( LCD_COLOR_BLACK );
-	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
-	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
+     LCD_SetTextColor( LCD_COLOR_BLACK );
+	//LCD_DrawFullRect( player1X+10, player1Y, player1W, player1H );
+	//LCD_DrawFullRect( player1X+10, player1Y, player1W, player1H );
+	//LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
+    //LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+  LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
 
+    /*demomode3=左向右*/
+    if (demoMode==3)
+    {
+        LCD_SetTextColor( LCD_COLOR_BLACK );
+       // LCD_DrawFullRect( 0, 0,LCD_PIXEL_WIDTH , 10 );
+        //LCD_DrawFullRect( 0, 0,10 , LCD_PIXEL_HEIGHT );
+        //LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT, LCD_PIXEL_WIDTH , 10 );
+        //LCD_DrawFullRect(LCD_PIXEL_WIDTH, LCD_PIXEL_HEIGHT,10 , LCD_PIXEL_HEIGHT );
+        LCD_DrawFullRect( player1X, player1Y, player1W, player1H );/*橫的長方形*/
+        player1X+=1;
+
+        if (player1X==LCD_PIXEL_WIDTH-5)
+            player1X=10;
+
+        if( STM_EVAL_PBGetState( BUTTON_USER ) )
+        {
+        /*    for(i=1;i<=(player1H%10+1);i++)
+            {
+                LCD_DrawFullRect( player1X+j, player1Y, player1H, player1W-j+i*10 );//直的長方形
+                LCD_DrawFullRect( player1X, player1Y, player1W-i*10-j, player1H );
+            }*/
+            player1X=player1X+j;
+            demoMode=4;
+            while( STM_EVAL_PBGetState( BUTTON_USER ) );
+        }
+
+        if( IOE_TP_GetState()->TouchDetected )
+        {
+            player1Y=player1Y-j;
+            demoMode=6;
+            while( IOE_TP_GetState()->TouchDetected );
+        }
+
+        if( (  (player1X+j  >= ballX -5 ) && (player1X+j <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
+        {
+          BallReset();
+          player1W+=5;
+          j+=10;
+          score2_0++;
+            if(score2_0 ==58)
+            {
+                score2_0=48;
+                score2_1++;
+            }
+        }
+
+    }
+
+    /*demomode4=上向下*/
+    if (demoMode==4)
+    {
+        LCD_SetTextColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( player1X, player1Y, player1H, player1W );
+        player1Y+=1;
+        if (player1Y==LCD_PIXEL_HEIGHT-5)
+            player1Y=0;
+        if( STM_EVAL_PBGetState( BUTTON_USER ) )
+        {
+            player1Y=player1Y+j;
+            demoMode=5;
+            while( STM_EVAL_PBGetState( BUTTON_USER ) );
+        }
+
+        if( IOE_TP_GetState()->TouchDetected )
+        {
+            player1X=player1X-j;
+            demoMode=3;
+            while( IOE_TP_GetState()->TouchDetected );
+        }
+
+        if( (  (player1X  >= ballX -5 ) && (player1X <= ballX +5 ) ) && ( ( player1Y+j >= ballY -5 ) ) && ( player1Y+j <= ballY +5) )
+        {
+            BallReset();
+            player1W+=5;
+            j+=10;
+            score2_0++;
+            if(score2_0 ==58)
+            {
+                score2_0=48;
+                score2_1++;
+            }
+        }
+
+
+    }
+
+    /*右向左*/
+    if (demoMode==5)
+    {
+        LCD_SetTextColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
+        player1X-=1;
+        if (player1X==0)
+            player1X=LCD_PIXEL_WIDTH;
+        if( STM_EVAL_PBGetState( BUTTON_USER ) )
+        {
+            player1Y=player1Y-j;
+            demoMode=6;
+            while( STM_EVAL_PBGetState( BUTTON_USER ) );
+        }
+
+        if( IOE_TP_GetState()->TouchDetected )
+        {
+            player1X=player1X+j;
+            demoMode=4;
+            while( IOE_TP_GetState()->TouchDetected );
+        }
+
+        if( (  (player1X   >= ballX -5 ) && (player1X  <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
+        {
+            BallReset();
+            player1W+=5;
+            j+=10;
+            score2_0++;
+            if(score2_0 ==58)
+            {
+                score2_0=48;
+                score2_1++;
+            }
+        }
+    }
+
+    /*下到上*/
+     if (demoMode==6)
+    {
+        LCD_SetTextColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( player1X, player1Y, player1H, player1W );
+        player1Y-=1;
+        if (player1Y==0)
+            player1Y=LCD_PIXEL_HEIGHT;
+        if( STM_EVAL_PBGetState( BUTTON_USER ) )
+        {
+            player1X=player1X-j;
+            demoMode=3;
+            while( STM_EVAL_PBGetState( BUTTON_USER ) );
+        }
+
+        if( IOE_TP_GetState()->TouchDetected )
+        {
+            player1Y=player1Y+j;
+            demoMode=5;
+            while( IOE_TP_GetState()->TouchDetected );
+        }
+
+        if( (  (player1X  >= ballX -5 ) && (player1X  <= ballX +5 ) ) && ( ( player1Y  >= ballY -5 ) ) && ( player1Y   <= ballY +5) )
+        {
+            BallReset();
+            player1W+=5;
+            j+=10;
+            score2_0++;
+            if(score2_0 ==58)
+            {
+                score2_0=48;
+                score2_1++;
+            }
+        }
+    }
+
+
+
+
+/*
+     if( STM_EVAL_PBGetState( BUTTON_USER ) && (demoMode == 5) ){
+        demoMode=6;
+        }
+
+     if( STM_EVAL_PBGetState( BUTTON_USER ) && (demoMode == 6) ){
+        demoMode=3;
+        }
+
+*/
 	if( demoMode == 0 ){
 		/*
 		if( player1IsReversed )
@@ -114,11 +306,11 @@ GAME_Update()
 		if( ballVY < 0 ){
 			if( player1X + player1W/2 < ballX + ballSize/2 ){
 				player1X += 8;
-				player2X += 2;
+				//player2X += 8;
 				}
 			else{
 				player1X -= 8;
-				player2X -= 2;
+				//player2X -= 8;
 				}
 			}
 			if( player1X <= 0 )
@@ -220,8 +412,8 @@ GAME_Update()
 				}
 			}
 		}
-		else{	//if demoMode == 1
-
+		if (demoMode == 1)
+{
 			//Player1 move
 			if( ballVY < 0 ){
 				if( player1X + player1W/2 < ballX + ballSize/2 ){
@@ -342,25 +534,128 @@ GAME_Update()
 	void
 GAME_Render()
 {
-    if((score2_0%2)==0)
+   /* if((score2_0%2)==0)
         LCD_SetTextColor( LCD_COLOR_BLUE );
      if((score2_0%2)==1)
-        LCD_SetTextColor( LCD_COLOR_GREEN );
-	//LCD_SetTextColor( LCD_COLOR_YELLOW );
+        LCD_SetTextColor( LCD_COLOR_GREEN );*/
+	/*LCD_SetTextColor( LCD_COLOR_GREEN );
 	LCD_SetBackColor( LCD_COLOR_BLACK );
-	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
-	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
-	LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
-	LCD_DrawLine( 10, LCD_PIXEL_HEIGHT / 2, LCD_PIXEL_WIDTH - 20, LCD_DIR_HORIZONTAL );
+	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );*/
+
+/*while(player1X!=100)
+    {
+                LCD_SetTextColor( LCD_COLOR_GREEN );
+               LCD_SetBackColor( LCD_COLOR_BLACK );
+               LCD_DrawFullRect( player1X, player1Y, player1W+i, player1H );//直的長方形
+               LCD_DrawFullRect( player1X+10, player1Y, player1H, player1W+i );
+
+    }*/
+
+    if (demoMode==3)
+    {
+        LCD_SetTextColor( LCD_COLOR_GREEN );
+        LCD_SetBackColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( 0, 25,LCD_PIXEL_WIDTH , 10 );//橫
+        LCD_DrawFullRect( 0, 25,10 , LCD_PIXEL_HEIGHT );//直
+        LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT-10, LCD_PIXEL_WIDTH , 10 );
+        LCD_DrawFullRect( LCD_PIXEL_WIDTH-10, 25,10 , LCD_PIXEL_HEIGHT-25 );
+        LCD_SetTextColor( LCD_COLOR_BLUE );
+        LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
+        //LCD_DrawFullRect( player1X, player1Y+50, player1H, player1W );
+        LCD_SetTextColor( LCD_COLOR_RED );
+        LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+        if( (  (player1X  >= ballX -5 ) && (player1X <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
+        {
+          BallReset();
+          score2_0++;
+        }
+
+  /*      if( STM_EVAL_PBGetState( BUTTON_USER ) )
+        {
+            for(i=1;i<=(player1H%10+1);i++)
+            {
+                LCD_DrawFullRect( player1X+j, player1Y, player1H, player1W-j+i*10 );//直的長方形
+                LCD_DrawFullRect( player1X, player1Y, player1W-i*10-j, player1H );
+            }
+            demoMode=4;
+            while( STM_EVAL_PBGetState( BUTTON_USER ) );
+        }
+*/
+
+    }
+    if (demoMode==4)
+    {
+        LCD_SetTextColor( LCD_COLOR_GREEN );
+        LCD_SetBackColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( 0, 25,LCD_PIXEL_WIDTH , 10 );//上線
+        LCD_DrawFullRect( 0, 25,10 , LCD_PIXEL_HEIGHT-25 );//左線
+        LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT-10, LCD_PIXEL_WIDTH , 10 );//下線
+        LCD_DrawFullRect( LCD_PIXEL_WIDTH-10, 25,10 , LCD_PIXEL_HEIGHT-25 );//右線
+        LCD_SetTextColor( LCD_COLOR_BLUE );
+        LCD_DrawFullRect( player1X, player1Y, player1H, player1W );
+        //LCD_DrawFullRect( player1X, player1Y+50, player1H, player1W );
+        LCD_SetTextColor( LCD_COLOR_RED );
+        LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+
+        if( (  (player1X  >= ballX -5 ) && (player1X <= ballX +5 ) ) && ( ( player1Y+j >= ballY -5 ) ) && ( player1Y+j <= ballY +5) )
+        {
+          BallReset();
+        }
+    }
+
+
+    if (demoMode==5)
+    {
+        LCD_SetTextColor( LCD_COLOR_GREEN );
+        LCD_SetBackColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( 0, 25,LCD_PIXEL_WIDTH , 10 );//橫
+        LCD_DrawFullRect( 0, 25,10 , LCD_PIXEL_HEIGHT );//直
+        LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT-10, LCD_PIXEL_WIDTH , 10 );
+        LCD_DrawFullRect( LCD_PIXEL_WIDTH-10, 25,10 , LCD_PIXEL_HEIGHT-25 );
+        LCD_SetTextColor( LCD_COLOR_BLUE );
+        //LCD_DrawFullRect( player1X, player1Y+50, player1H, player1W );
+        LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
+        LCD_SetTextColor( LCD_COLOR_RED );
+        LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+
+        if( (  (player1X   >= ballX -5 ) && (player1X  <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
+        {
+          BallReset();
+        }
+    }
+
+    if (demoMode==6)
+    {
+        LCD_SetTextColor( LCD_COLOR_GREEN );
+        LCD_SetBackColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( 0, 25,LCD_PIXEL_WIDTH , 10 );//橫
+        LCD_DrawFullRect( 0, 25,10 , LCD_PIXEL_HEIGHT );//直
+        LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT-10, LCD_PIXEL_WIDTH , 10 );
+        LCD_DrawFullRect( LCD_PIXEL_WIDTH-10, 25,10 , LCD_PIXEL_HEIGHT-25 );
+        LCD_SetTextColor( LCD_COLOR_BLUE );
+        LCD_DrawFullRect( player1X, player1Y, player1H, player1W );
+        //LCD_DrawFullRect( player1X, player1Y+50, player1H, player1W );
+        LCD_SetTextColor( LCD_COLOR_RED );
+        LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+
+        if( (  (player1X  >= ballX -5 ) && (player1X <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
+        {
+          BallReset();
+        }
+    }
+	//LCD_DrawFullRect( player1X+10, player1Y, player1W, player1H );
+	//LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
+
+	//LCD_DrawLine( 10, LCD_PIXEL_HEIGHT / 2, LCD_PIXEL_WIDTH - 20, LCD_DIR_HORIZONTAL );
     //LCD_SetBackColor(LCD_COLOR_GREEN);
     //LCD_DisplayStringLine(LINE(1),score2);
     //sprintf((char*) score1, MESSAGE1 , score2);
     //LCD_DisplayStringLine(LINE(10), (uint8_t*)score2);
-    if (score2_0 == 47)
+   if (score2_0 == 47)
         score2_0 =48;
 
-    LCD_DisplayChar(200,15, score2_0);
-    LCD_DisplayChar(200,0, score2_1);
+    LCD_DisplayChar(0,30, score2_0);
+    LCD_DisplayChar(0,15, score2_1);
     //LCD_DisplayStringLine(LINE(10), "HELLO");
 
     //LCD_DrawRect(30,40,50,50);
