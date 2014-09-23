@@ -9,15 +9,16 @@
 #include <string.h>
 #include <time.h>
 
-#define MESSAGE1   "SCORE= %d"   //提示信息
+#define MESSAGE1   "Level  %d"   //提示信息
 //Player1
-int16_t player1X = 10;
-int16_t player1Y = 1;
+int16_t player1X = 20;
+int16_t player1Y = 35;
 uint16_t player1W = 10;
 uint16_t player1H = 10;
 uint8_t player1IsReversed = 1;
 int16_t player1XX;
 int16_t i , j , k=0;
+int16_t speed=1;
 
 //Player2
 int16_t player2X = LCD_PIXEL_WIDTH - 20;
@@ -31,7 +32,7 @@ uint16_t ballSize = 5;              //球的大小
 //int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) /2;   //??
 //int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) /2; //??
 int16_t ballX = 50;
-int16_t ballY = 1;
+int16_t ballY = 35;
 int16_t ballVX = 5;
 int16_t ballVY = 5;
 uint8_t ballIsRun = 0;
@@ -65,8 +66,8 @@ BallReset()
 	*/
 
 
-    ballX= (rand() % (LCD_PIXEL_WIDTH -10) ) +1;
-    ballY= (rand() % (LCD_PIXEL_HEIGHT-10 )) +1;
+    ballX= (rand() % (LCD_PIXEL_WIDTH -30) ) ;
+    ballY= (rand() % (LCD_PIXEL_HEIGHT-30 )) ;
 }
 //player1 is burron
 void
@@ -120,16 +121,19 @@ GAME_Update()
     if (demoMode==3)
     {
         LCD_SetTextColor( LCD_COLOR_BLACK );
+        //LCD_DisplayChar(10,20,LCD_PIXEL_WIDTH);
        // LCD_DrawFullRect( 0, 0,LCD_PIXEL_WIDTH , 10 );
         //LCD_DrawFullRect( 0, 0,10 , LCD_PIXEL_HEIGHT );
         //LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT, LCD_PIXEL_WIDTH , 10 );
         //LCD_DrawFullRect(LCD_PIXEL_WIDTH, LCD_PIXEL_HEIGHT,10 , LCD_PIXEL_HEIGHT );
         LCD_DrawFullRect( player1X, player1Y, player1W, player1H );/*橫的長方形*/
-        player1X+=1;
+        player1X+=speed;
 
-        if (player1X==LCD_PIXEL_WIDTH-5)
-            player1X=10;
-
+        if (player1X +j == LCD_PIXEL_WIDTH -10)
+        {
+            demoMode=7;
+        }
+        //按下按鈕
         if( STM_EVAL_PBGetState( BUTTON_USER ) )
         {
         /*    for(i=1;i<=(player1H%10+1);i++)
@@ -142,6 +146,7 @@ GAME_Update()
             while( STM_EVAL_PBGetState( BUTTON_USER ) );
         }
 
+        //按下螢幕
         if( IOE_TP_GetState()->TouchDetected )
         {
             player1Y=player1Y-j;
@@ -159,6 +164,7 @@ GAME_Update()
             {
                 score2_0=48;
                 score2_1++;
+                speed+=1;
             }
         }
 
@@ -169,9 +175,11 @@ GAME_Update()
     {
         LCD_SetTextColor( LCD_COLOR_BLACK );
         LCD_DrawFullRect( player1X, player1Y, player1H, player1W );
-        player1Y+=1;
-        if (player1Y==LCD_PIXEL_HEIGHT-5)
-            player1Y=0;
+        player1Y+=speed;
+
+        if (player1Y + j== LCD_PIXEL_HEIGHT-10)
+            demoMode =7 ;
+
         if( STM_EVAL_PBGetState( BUTTON_USER ) )
         {
             player1Y=player1Y+j;
@@ -196,9 +204,9 @@ GAME_Update()
             {
                 score2_0=48;
                 score2_1++;
+                speed+=1;
             }
         }
-
 
     }
 
@@ -207,9 +215,11 @@ GAME_Update()
     {
         LCD_SetTextColor( LCD_COLOR_BLACK );
         LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
-        player1X-=1;
-        if (player1X==0)
-            player1X=LCD_PIXEL_WIDTH;
+        player1X-=speed;
+
+        if (player1X -j == 10)
+            demoMode=7;
+
         if( STM_EVAL_PBGetState( BUTTON_USER ) )
         {
             player1Y=player1Y-j;
@@ -234,6 +244,7 @@ GAME_Update()
             {
                 score2_0=48;
                 score2_1++;
+                speed+=1;
             }
         }
     }
@@ -243,12 +254,13 @@ GAME_Update()
     {
         LCD_SetTextColor( LCD_COLOR_BLACK );
         LCD_DrawFullRect( player1X, player1Y, player1H, player1W );
-        player1Y-=1;
-        if (player1Y==0)
-            player1Y=LCD_PIXEL_HEIGHT;
+        player1Y-=speed;
+
+        if (player1Y = j ==  25)
+            demoMode = 7;
         if( STM_EVAL_PBGetState( BUTTON_USER ) )
         {
-            player1X=player1X-j;
+            player1X=player1X;
             demoMode=3;
             while( STM_EVAL_PBGetState( BUTTON_USER ) );
         }
@@ -270,11 +282,15 @@ GAME_Update()
             {
                 score2_0=48;
                 score2_1++;
+                speed+=1;
             }
         }
     }
 
+ if (demoMode==7)
+{
 
+}
 
 
 /*
@@ -569,6 +585,8 @@ GAME_Render()
           BallReset();
           score2_0++;
         }
+        if (player1X +j == LCD_PIXEL_WIDTH -10)
+           demoMode =7;
 
   /*      if( STM_EVAL_PBGetState( BUTTON_USER ) )
         {
@@ -598,9 +616,10 @@ GAME_Render()
         LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
 
         if( (  (player1X  >= ballX -5 ) && (player1X <= ballX +5 ) ) && ( ( player1Y+j >= ballY -5 ) ) && ( player1Y+j <= ballY +5) )
-        {
           BallReset();
-        }
+
+        if (player1Y + j == LCD_PIXEL_HEIGHT-10)
+            demoMode =7 ;
     }
 
 
@@ -619,9 +638,10 @@ GAME_Render()
         LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
 
         if( (  (player1X   >= ballX -5 ) && (player1X  <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
-        {
-          BallReset();
-        }
+            BallReset();
+
+        if (player1X - j==10)
+            demoMode=7;
     }
 
     if (demoMode==6)
@@ -639,16 +659,31 @@ GAME_Render()
         LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
 
         if( (  (player1X  >= ballX -5 ) && (player1X <= ballX +5 ) ) && ( ( player1Y >= ballY -5 ) ) && ( player1Y <= ballY +5) )
-        {
           BallReset();
-        }
+
+        if (player1Y -j ==25)
+            demoMode=7;
+
+    }
+
+    if (demoMode == 7)
+    {
+        LCD_SetTextColor( LCD_COLOR_RED );
+        LCD_DisplayStringLine(LINE(10), "   GAME OVER");
+        LCD_SetTextColor( LCD_COLOR_GREEN );
+        LCD_SetBackColor( LCD_COLOR_BLACK );
+        LCD_DrawFullRect( 0, 25,LCD_PIXEL_WIDTH , 10 );//橫
+        LCD_DrawFullRect( 0, 25,10 , LCD_PIXEL_HEIGHT );//直
+        LCD_DrawFullRect(0, LCD_PIXEL_HEIGHT-10, LCD_PIXEL_WIDTH , 10 );
+        LCD_DrawFullRect( LCD_PIXEL_WIDTH-10, 25,10 , LCD_PIXEL_HEIGHT-25 );
+
     }
 	//LCD_DrawFullRect( player1X+10, player1Y, player1W, player1H );
 	//LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
 
 	//LCD_DrawLine( 10, LCD_PIXEL_HEIGHT / 2, LCD_PIXEL_WIDTH - 20, LCD_DIR_HORIZONTAL );
     //LCD_SetBackColor(LCD_COLOR_GREEN);
-    //LCD_DisplayStringLine(LINE(1),score2);
+    //LCD_DisplayStringLine(LINE(1), "level %d" , speed);
     //sprintf((char*) score1, MESSAGE1 , score2);
     //LCD_DisplayStringLine(LINE(10), (uint8_t*)score2);
    if (score2_0 == 47)
@@ -661,3 +696,4 @@ GAME_Render()
     //LCD_DrawRect(30,40,50,50);
     //LCD_DrawFullRect(31, 41, 179, 149);
 }
+
